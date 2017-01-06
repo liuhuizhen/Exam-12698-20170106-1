@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<typeAliases>
+		<typeAlias alias="Film" type="com.hand.dto.Film" />
+		<typeAlias alias="User" type="com.hand.dto.Customer" />
+		<typeAlias alias="Language" type="com.hand.dto.Language" />
+	</typeAliases>
+	<mappers>
+		<mapper resource="filmMapper.xml" />
+		<mapper resource="userMapper.xml" />
+		<mapper resource="languageMapper.xml" />
+	</mappers>
+</configuration>

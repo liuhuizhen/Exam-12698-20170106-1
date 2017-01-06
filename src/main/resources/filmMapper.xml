@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hand.dao.FilmMapper">
+
+	<resultMap type="Film" id="resultListFilm">
+		<id column="film_id" property="film_id" />
+		<result column="title" property="title" />
+		<result column="description" property="description" />
+		<result column="name" property="name" />
+	</resultMap>
+
+	<select id="selectFilms" resultMap="resultListFilm">
+		select film_id,title,description,f.language_id language_id,name
+		from film f,language l where l.language_id=f.language_id limit
+		#{offset},#{pageSize}
+	</select>
+
+	<select id="selectCount" resultType="int">
+		select count(1) from film f,language l where l.language_id=f.language_id
+	</select>
+
+	<delete id="delFilm">
+		delete from film where film_id =#{film_id}
+	</delete>
+
+	<select id="selFilmById" resultType="Film">
+		select film_id,title,description,f.language_id language_id,name
+		from film f,language l where l.language_id=f.language_id and film_id
+		=#{film_id}
+	</select>
+	<insert id="addFilm" useGeneratedKeys="true" keyProperty="film_id">
+		insert
+		into film(title,description,language_id)
+		values(#{title},#{description},#{language_id})
+	</insert>
+	<update id="updateFilm">
+		update film set
+		title=#{title},description=#{description},language_id=#{language_id}
+		where film_id=#{film_id}
+	</update>
+</mapper>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet"
+	href="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+<script
+	src="https://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+<script
+	src="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+		<form class="form-horizontal" role="form">
+			<div class="form-group">
+				<label for="firstname" class="col-sm-2 control-label">title</label>
+				<div class="col-sm-4">
+					<input type="text" class="form-control" id="title"
+						placeholder="请输入title">
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="lastname" class="col-sm-2 control-label">description</label>
+				<div class="col-sm-4">
+					<input type="text" class="form-control" id="description"
+						placeholder="请输入description">
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="lastname" class="col-sm-2 control-label">language</label>
+				<div class="col-sm-4"> 
+				<select id="language" class="form-control" >
+			</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-10">
+					<button id="updateFilm" type="button" class="btn btn-default">更新</button>
+				</div>
+			</div>
+		</form>
+</div>
+</body>
+<script type="text/javascript">
+$("document").ready(function(){
+	selLanguage();
+	var film_id=getQueryString("film_id");
+	selectFilm({film_id:Number(film_id)});
+	$("#updateFilm").click(function(){
+		updateFilm({
+			film_id:film_id,
+			title:$("#title").val(),
+		    description:$("#description").val(),
+		    language:$("#language").val()
+		});
+	});
+});
+
+function selLanguage(){
+	$.ajax({
+		async:false,
+		url:"/Exam-12698-20170106-1/film/selLanguage",
+		type:"GET",
+		dataType:"json",
+		contextType:"application/json",
+		success:function(data){
+			 for (var item of data) {
+			$("#language").append(" <option value='"+item.name+"'>"+item.name+"</option>");
+		};
+		}
+	});
+}
+function getQueryString(name) {
+    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) {
+        return unescape(r[2]);
+    }
+    return null;
+}
+
+
+function selectFilm(filmInfo){
+	
+	var filmArg={
+			film_id:""
+	};
+	filmInfo=$.extend({},filmArg,filmInfo);
+	$.ajax({
+		async:false,
+		url:"/Exam-12698-20170106-1/film/selectOne",
+		type:"GET",
+		dataType:"json",
+		contextType:"application/json",
+		data:filmInfo,
+		success:function(data){
+			$("#title").val(data.title);
+			$("#description").val(data.description);
+		    $("#language").val(data.name);
+		}
+	});
+}
+function updateFilm(filmInfo){
+	var arg={
+			film_id:"",
+			title:"",
+			description:"",
+			language:""
+	};
+	$.ajax({
+		url:"/Exam-12698-20170106-1/film/updateFilm",
+		type:"GET",
+		dataType:"json",
+		data:filmInfo,
+		success:function(data){
+			window.alert("修改成功，返回首页");
+			window.location=data.url;
+		},
+	    error:function(data){
+		    window.alert("修改失败");
+		    window.location=data.url;
+	}
+	});
+}
+</script>
+</html>

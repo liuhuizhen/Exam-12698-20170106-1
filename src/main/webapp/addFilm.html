@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet"
+	href="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+<script
+	src="https://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+<script
+	src="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+		<form class="form-horizontal" role="form">
+			<div class="form-group">
+				<label for="firstname" class="col-sm-2 control-label">title</label>
+				<div class="col-sm-4">
+					<input type="text" class="form-control" id="title"
+						placeholder="请输入title">
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="lastname" class="col-sm-2 control-label">description</label>
+				<div class="col-sm-4">
+					<input type="text" class="form-control" id="description"
+						placeholder="请输入description">
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="lastname" class="col-sm-2 control-label">language</label>
+				<div class="col-sm-4"> 
+					<select id="language" class="form-control">
+			</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-10">
+					<button id="addFilm" type="button" class="btn btn-default">确认添加</button>
+				</div>
+			</div>
+		</form>
+</div>
+</body>
+
+<script type="text/javascript">
+$("document").ready(function(){	
+	selLanguage();
+	$("#addFilm").click(function(){
+		addFilm({
+			title:$("#title").val(),
+		    description:$("#description").val(),
+		    language:$("#language").val()
+		});
+	});
+});
+function selLanguage(){
+	$.ajax({
+		async:false,
+		url:"/Exam-12698-20170106-1/film/selLanguage",
+		type:"GET",
+		dataType:"json",
+		contextType:"application/json",
+		success:function(data){
+			 for (var item of data) {
+			$("#language").append(" <option value='"+item.name+"'>"+item.name+"</option>");
+		};
+		}
+	});
+};	
+
+function addFilm(filmInfo){
+	var arg={
+			title:"",
+			description:"",
+			language:""
+	};
+	$.ajax({
+		url:"/Exam-12698-20170106-1/film/addFilm",
+		type:"GET",
+		dataType:"json",
+		data:filmInfo,
+		success:function(data){
+			window.alert("添加成功，返回首页");
+			window.location=data.url;
+		},
+	    error:function(data){
+		    window.alert("添加失败");
+		    window.location=data.url;
+	}
+	});
+}
+</script>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta charset="UTF-8">
+<title>film</title>
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="expires" content="0">
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="This is my page">
+<!--
+	<link rel="stylesheet" type="text/css" href="styles.css">
+	-->
+<link rel="stylesheet"
+	href="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+<script
+	src="https://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+<script
+	src="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+	<div class="container" >
+			<div class="form-group" style="margin:50 auto;">
+				<div class="col-sm-offset-2 col-sm-10">
+					<button id="selectFilms" type="button" class="btn btn-default">查询所有</button>
+					<a href="addFilm.html"><button id="addFilm" type="button" class="btn btn-default">添加电影</button></a>
+				</div>
+			</div>
+
+		<div>
+			<table id="filmTable" class="table table-bordered">
+				<caption>电影信息表</caption>
+				<thead>
+					<tr>
+						<th>film_id</th>
+						<th>title</th>
+						<th>description</th>
+						<th>language</th>
+						<th>编辑</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+		<div class="col-sm-offset-4 col-sm-4">
+			<ul class="pagination" id="pagination">
+				<li><a href="#">&laquo;</a></li>
+				<li><a href="#">&raquo;</a></li>
+			</ul>
+		</div>
+
+		<div class="col-sm-1">
+			<select id="pageSize" class="form-control">
+				<option value="10">10</option>
+				<option value="20">20</option>
+				<option value="50">50</option>
+			</select>
+		</div>
+
+		<div class="col-sm-1">
+			<input id="page" type="number" class="form-control" min="1">
+		</div>
+		<button id="go" class="btn btn-primary">跳转</button>
+	</div>
+
+	<script id="rowTemp" type="application/html">
+        <tr>
+            <td></td><td></td><td></td><td></td><td></td>
+        </tr>
+    </script>
+	<script>
+		$("document").ready(function(){
+			
+			window.page={
+					page:1,
+					pageSize:Number($("#pageSize").val()),
+					total:0,
+					totalPage:0
+			};
+			selectFilms(page);
+			
+			$("#selectFilms").click(function(){
+				selectFilms();
+			});
+			
+		    $("#pagination").children("li:first").click(function() {
+	                window.page.page = 1;
+	                selectFilms(window.page);
+	        });
+
+	        $("#pagination").children("li:last").click(function() {
+	                window.page.page = window.page.totalPage;
+	                selectUsers(window.page);
+	        });
+
+	        $("#pageSize").change(function() {
+	                window.page.page = 1;
+	                window.page.pageSize = Number($("#pageSize").val());
+	                selectFilms(window.page);
+	        });
+
+	        $("#go").click(function() {
+	                window.page.page = Number($("#page").val());
+	                selectFilms(window.page);
+	        });
+			
+		});
+		
+		
+		function setPage(selectInfo){
+			window.page.total=selectInfo.total;
+			window.page.page=selectInfo.page;
+			window.page.pageSize=selectInfo.pageSize;
+			window.page.totalPage=Math.ceil(selectInfo.total/window.page.pageSize);
+			
+			
+		};
+		
+		  function pageRange(min,max) {
+	            var arr = [];
+	            for (var i=min ;i <= max; i++) {
+	                arr.push(i);
+	            }
+	            return arr;
+	        }
+		
+		function refreshPage() {
+            $("#pagination").children("li.page").remove();
+            var pages = [];
+            if (window.page.totalPage - window.page.page < 2) {
+                pages = pageRange(Math.max(1,window.page.totalPage-4),window.page.totalPage);
+            } else if (window.page.page -1 < 2) {
+                pages = pageRange(1, Math.min(window.page.totalPage,5));
+            } else {
+                pages =  pageRange(Number(window.page.page)-2,Number(window.page.page)+2);
+            }
+            var template = "<li class='page'><a href='#'></a></li>";
+            for (var item of pages) {
+                var $first = $("#pagination").children("li:last");
+                var $template = $(template);
+                $template.children("a").text(item);
+                if (item == window.page.page) {
+                    $template.addClass("active");
+                }
+                $first.before($template);
+            }
+            
+            $("#pagination").children("li:first").removeClass("disabled");
+            $("#pagination").children("li:last").removeClass("disabled");
+            if (window.page.page == 1) {
+                $("#pagination").children("li:first").addClass("disabled");
+            }
+            if (window.page.page == page.totalPage) {
+                $("#pagination").children("li:last").addClass("disabled");
+            }
+
+            $("#pagination li.page").click(function(event) {
+                console.log(event);
+                window.page.page = Number($(event.target).text());
+                selectFilms(window.page);
+            });
+        };
+		
+		function selectFilms(selectInfo){
+			var defaultArg={
+					page: 1,
+	                pageSize: 10
+			};
+		
+		selectInfo=$.extend({},defaultArg,selectInfo);
+		$.ajax({
+			url:"/Exam-12698-20170106-1/film",
+			type:"GET",
+			dataType:"json",
+			data:selectInfo,
+			success:function(data){
+				selectInfo.total=data.total;
+				setPage(selectInfo);
+				$("#filmTable tbody").empty();
+                for (var item of data.rows) {
+                    var $temp = $($("#rowTemp").html()).clone();
+                    $temp.children("td").eq(0).text(item.film_id);
+                    $temp.children("td").eq(1).text(item.title);
+                    $temp.children("td").eq(2).text(item.description);
+                    $temp.children("td").eq(3).text(item.name);
+                    $temp.children("td").eq(4).html("<a href='/Exam-12698-20170106-1/update.html?film_id="+item.film_id+"'>编辑</a>/<a onclick='javascript:delFilm("+item.film_id+");'>删除</a>");
+                    $("#filmTable").append($temp);
+                }
+                $("#page").attr("max",window.page.totalPage);
+                $("#page").val(selectInfo.page);
+                refreshPage();
+			}
+		});
+		
+		}
+		
+		function delFilm(film_id){
+			if(confirm("确定要删除改条数据吗")){   
+			var arg={
+					film_id:film_id
+			};
+			$.ajax({
+				url:"/Exam-12698-20170106-1/film/delFilm",
+				type:"GET",
+				dataType:"json",
+				data:arg,
+				success:function(data){
+					 window.alert("删除成功，返回首页");
+					window.location=data.url;
+				},
+			    error:function(data){
+				    window.alert("删除失败，有主外键关联");
+			}
+			});
+			 }else{
+					
+			   }
+		}
+		</script>
+</body>
+</html>
